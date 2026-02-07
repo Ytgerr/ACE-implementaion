@@ -1,0 +1,32 @@
+[project]
+name = "datasets-module"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "albumentations>=2.0.8",
+    "datasets>=4.5.0",
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.2",
+    "opencv-python>=4.13.0.92",
+    "pillow>=12.1.0",
+    "torch>=2.10.0",
+    "torchvision>=0.25.0",
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu130" },
+]
+torchvision = [
+    { index = "pytorch-cu130" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.1.0",
+]
