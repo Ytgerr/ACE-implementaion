@@ -65,3 +65,11 @@ A custom Convolutional Neural Network (CNN) was trained on the Imagenette datase
 #### Results
 
 Final accuracy: 85.87% after 80 epochs
+
+## Load the CNN
+
+To load the model you may go here:
+
+```bash
+http://193.104.57.253/download/cnn_model
+```
