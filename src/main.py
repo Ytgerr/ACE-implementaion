@@ -4,7 +4,7 @@ import torchvision
 from PIL import Image
 from models.CNN.model import load_model
 from models.CNN.extract_embedding import extract_superpixel_embedding
-from models.SLIC.super_pixel_segmentation import slic_segmentation
+from models.SLIC.super_pixel_segmentation import slic_segmentation, crop_superpixel
 
 model, device = load_model()
 ds_raw = torchvision.datasets.Imagenette("../../datasets", split="val", download=True, transform=None)
@@ -15,8 +15,26 @@ labels = slic_segmentation(image, n_segments=50, compactness=20)
 
 seg_id = int(np.random.choice(np.unique(labels)))
 
-emb = extract_superpixel_embedding()
+patch = crop_superpixel(image, labels, segment_id=seg_id, out_size=128, pad_value=(124, 116, 104), bbox_pad=0.2)
+
+emb = extract_superpixel_embedding(patch, model=model, device=device)
 
 print("class target:", target)
 print("segment id:", seg_id)
-print("embedding:", emb)
+print("embedding:", emb.shape) 
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(4,4))
+plt.imshow(patch)             
+plt.title(f"seg_id={seg_id}")
+plt.axis("off")
+plt.show()
+
+import torch
+
+print("min/max:", emb.min().item(), emb.max().item())
+print("mean/std:", emb.mean().item(), emb.std().item())
+print("any NaN:", torch.isnan(emb).any().item())
+print("any Inf:", torch.isinf(emb).any().item())
+print("L2 norm:", emb.norm(p=2).item())
