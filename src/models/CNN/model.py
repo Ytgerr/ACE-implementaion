@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+from pathlib import Path
 
 class CNN(nn.Module):
     def __init__(self, num_classes, fe_dropout=0.1, cl_dropout=0.5):
@@ -52,9 +52,15 @@ def load_model(path: str = "cnn_model.pth"):
     Returns the model saved in CNN project folder
     """ 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    base_dir = Path(__file__).resolve().parent 
+    path = base_dir / "cnn_model.pth"
     data = torch.load(path, map_location=device) 
+    
     model = CNN(10)
     model.load_state_dict(data["model"])
     model.to(device)
     model.eval()
-    return model
+    return model, device
+
+
