@@ -1,4 +1,4 @@
-from torch import load, flatten
+import torch
 import torch.nn as nn
 
 
@@ -42,7 +42,7 @@ class CNN(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        x = flatten(x, 1)
+        x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
 
@@ -50,10 +50,11 @@ class CNN(nn.Module):
 def load_model(path: str = "cnn_model.pth"):
     """
     Returns the model saved in CNN project folder
-    """
-    data = load(path)
+    """ 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    data = torch.load(path, map_location=device) 
     model = CNN(10)
-
     model.load_state_dict(data["model"])
-
+    model.to(device)
+    model.eval()
     return model

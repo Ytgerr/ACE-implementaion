@@ -1,2 +1,3 @@
 myevn
 __pycache__
+*.pth

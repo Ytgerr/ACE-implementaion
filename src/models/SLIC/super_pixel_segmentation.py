@@ -2,6 +2,61 @@ import numpy as np
 from skimage.color import rgb2lab
 from skimage.util import img_as_float
 from scipy.ndimage import sobel
+from PIL import Image
+
+def crop_superpixel(image, labels, segment_id, out_size,
+                        pad_value=(124, 116, 104), bbox_pad=0.2):
+    img = img_as_float(image)
+    H, W = labels.shape
+
+    mask = (labels == segment_id)
+    if not np.any(mask):
+        return None
+
+    ys, xs = np.where(mask)
+    y0, y1 = ys.min(), ys.max() + 1
+    x0, x1 = xs.min(), xs.max() + 1
+
+    if bbox_pad > 0:
+        bh = y1 - y0
+        bw = x1 - x0
+        py = int(round(bh * bbox_pad))
+        px = int(round(bw * bbox_pad))
+        y0 = max(0, y0 - py)
+        y1 = min(H, y1 + py)
+        x0 = max(0, x0 - px)
+        x1 = min(W, x1 + px)
+
+    crop = img[y0:y1, x0:x1].copy()
+    crop_mask = mask[y0:y1, x0:x1]
+
+    if isinstance(pad_value, (tuple, list, np.ndarray)):
+        pad_rgb_255 = np.array(pad_value, dtype=np.float32)
+    else:
+        pad_rgb_255 = np.array([pad_value, pad_value, pad_value], dtype=np.float32)
+
+    pad_rgb_01 = pad_rgb_255 / 255.0 
+
+    crop[~crop_mask] = pad_rgb_01
+
+    ch, cw = crop.shape[:2]
+    scale = min(out_size / max(cw, 1), out_size / max(ch, 1))
+    new_w = max(1, int(round(cw * scale)))
+    new_h = max(1, int(round(ch * scale)))
+
+    crop_uint8 = (np.clip(crop, 0, 1) * 255).astype(np.uint8)
+    pil_crop = Image.fromarray(crop_uint8, mode="RGB").resize((new_w, new_h), Image.BILINEAR)
+
+    canvas = Image.new("RGB", (out_size, out_size),
+                       tuple(int(round(x)) for x in pad_rgb_255))
+
+    paste_x = (out_size - new_w) // 2
+    paste_y = (out_size - new_h) // 2
+    canvas.paste(pil_crop, (paste_x, paste_y))
+
+    patch = np.asarray(canvas).astype(np.float32) / 255.0  
+
+    return patch
 
 
 def _init_centers(lab, S):
