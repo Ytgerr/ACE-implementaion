@@ -1,3 +1,5 @@
 myevn
 __pycache__
 *.pth
+.venv
+saved_concepts
