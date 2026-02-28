@@ -11,12 +11,15 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
-TARGET_CLASS = 0       
-NUM_IMAGES = 50            
-RESOLUTIONS = [15, 50, 80] 
-NUM_CONCEPTS_K = 25
-COMPACTNESS = 20
-BACKGROUND_FILTER = 0.005
+TARGET_CLASS = 0  # class from golden set(available 0, 1, 2)    
+NUM_IMAGES = 50  # number of images       
+RESOLUTIONS = [15, 50, 80] # Size of super pixel 
+NUM_CONCEPTS_K = 25 # number of clusters
+
+# Higher — more regular / square-like (grid-like).
+# Lower — more irregular / boundary-adaptive (contour-following). 
+COMPACTNESS = 20 
+BACKGROUND_FILTER = 0.005 # threshhold for background superpixels
 
 model, device = load_model()
 data_dir = Path(f"src/datasets/golden_set/{TARGET_CLASS}")
