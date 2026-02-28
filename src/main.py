@@ -15,6 +15,7 @@ TARGET_CLASS = 0
 NUM_IMAGES = 50            
 RESOLUTIONS = [15, 50, 80] 
 NUM_CONCEPTS_K = 25
+COMPACTNESS = 20
 
 model, device = load_model()
 data_dir = Path(f"src/datasets/golden_set/{TARGET_CLASS}")
@@ -33,7 +34,7 @@ all_patches = []
 with torch.no_grad():
     for img_np, label in tqdm(images_of_class):
         for n_seg in RESOLUTIONS:
-            labels = slic_segmentation(img_np, n_segments=n_seg, compactness=20)
+            labels = slic_segmentation(img_np, n_segments=n_seg, compactness=COMPACTNESS)
             unique_labels = np.unique(labels)
             for seg_id in unique_labels:
                 patch = crop_superpixel(img_np, labels, segment_id=seg_id, out_size=128)
