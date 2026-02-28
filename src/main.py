@@ -16,6 +16,7 @@ NUM_IMAGES = 50
 RESOLUTIONS = [15, 50, 80] 
 NUM_CONCEPTS_K = 25
 COMPACTNESS = 20
+BACKGROUND_FILTER = 0.005
 
 model, device = load_model()
 data_dir = Path(f"src/datasets/golden_set/{TARGET_CLASS}")
@@ -40,7 +41,7 @@ with torch.no_grad():
                 patch = crop_superpixel(img_np, labels, segment_id=seg_id, out_size=128)
                 if patch is None:
                     continue
-                if np.var(patch) < 0.005: 
+                if np.var(patch) < BACKGROUND_FILTER: 
                     continue
                 
                 emb = extract_superpixel_embedding(patch, model=model, device=device)
