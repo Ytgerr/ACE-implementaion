@@ -16,8 +16,9 @@ NUM_IMAGES = 50  # number of images
 RESOLUTIONS = [15, 50, 80] # Size of super pixel 
 NUM_CONCEPTS_K = 25 # number of clusters
 
-# Higher — more regular / square-like (grid-like).
-# Lower — more irregular / boundary-adaptive (contour-following). 
+# SLIC parameter
+# Higher — more regular / pixels square-like (grid-like).
+# Lower — more irregular / pixels boundary-adaptive (contour-following). 
 COMPACTNESS = 20 
 BACKGROUND_FILTER = 0.005 # threshhold for background superpixels
 
