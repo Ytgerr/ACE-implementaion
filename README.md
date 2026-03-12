@@ -75,3 +75,9 @@ http://193.104.57.253/download/cnn_model
 ```
 
 Put loaded file into CNN folder before use
+
+## To Load Dependencies
+
+```bash
+uv sync --extra gpu --index-strategy unsafe-best-match
+```
