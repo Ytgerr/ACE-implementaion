@@ -2,6 +2,23 @@ import torch
 import torch.nn as nn
 from pathlib import Path
 
+name_mapping = {
+    "tench": "n01440764",
+    "English springer": "n02102040",
+    "cassette player": "n02979186",
+    "chain saw": "n03000684",
+    "church": "n03028079",
+    "French horn": "n03394916",
+    "garbage truck": "n03417042",
+    "gas pump": "n03425413",
+    "golf ball": "n03445777",
+    "parachute": "n03888257",
+}
+
+id_mapping = {v: k for k, v in name_mapping.items()}
+idx_mapping = {idx: k for idx, k in enumerate(name_mapping.keys())}
+
+
 class CNN(nn.Module):
     def __init__(self, num_classes, fe_dropout=0.1, cl_dropout=0.5):
         super(CNN, self).__init__()
@@ -50,17 +67,69 @@ class CNN(nn.Module):
 def load_model(path: str = "cnn_model.pth"):
     """
     Returns the model saved in CNN project folder
-    """ 
+    """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
-    base_dir = Path(__file__).resolve().parent 
+
+    base_dir = Path(__file__).resolve().parent
     path = base_dir / "cnn_model.pth"
-    data = torch.load(path, map_location=device) 
-    
+    data = torch.load(path, map_location=device)
+
     model = CNN(10)
     model.load_state_dict(data["model"])
     model.to(device)
     model.eval()
+
     return model, device
 
 
+if __name__ == "__main__":
+    from PIL import Image
+    from pathlib import Path
+    import random as rn
+    import numpy as np
+    from torchvision.transforms import v2
+    import matplotlib.pyplot as plt
+
+    transforms = v2.Compose(
+        [
+            v2.ToImage(),
+            v2.Resize(size=(128, 128)),
+            v2.ToDtype(torch.float32, scale=True),
+            v2.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ]
+    )
+
+    model, device = load_model(Path("./src/models/CNN/cnn_model.pth"))
+
+    random_class = rn.choice(list(id_mapping.keys()))
+
+    dir = Path("./src/datasets/imagenette2/train") / random_class
+    print("Taking photo from: {} ({})".format(dir, id_mapping[random_class]))
+
+    images = [file for file in dir.iterdir()]
+
+    image = Image.open(rn.choice(images))
+    input_image: torch.Tensor = transforms(image)
+    input_image = input_image.to(device).unsqueeze(0)
+
+    logits: torch.Tensor = model(input_image)
+    logits = logits.cpu().detach()[0]
+    predicts = torch.softmax(logits, dim=0).numpy()
+
+    print(
+        "Predicted Class: {}\n with total perception: {}".format(
+            idx_mapping[np.argmax(predicts)],
+            round(np.max(predicts), 2),
+        )
+    )
+
+    print("Also less probable classes: ")
+
+    for pred in np.argsort(predicts)[::-1]:
+        print("  {:<20} {}".format(idx_mapping[pred], round(predicts[pred], 2)))
+
+    plt.imshow(image)
+    plt.title(
+        f"pred: {idx_mapping[np.argmax(predicts)]}   orig: {id_mapping[random_class]}"
+    )
+    plt.show()
