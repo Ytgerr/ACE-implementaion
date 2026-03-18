@@ -1,15 +1,19 @@
 from typing import Literal, Tuple
 
+
 import numpy as np
 import torch
 from pathlib import Path
 from PIL import Image
-from models.CNN.model import load_model
+from models.CNN.model import CNN, load_model
 from models.CNN.extract_embedding import extract_superpixel_embedding
 from models.SLIC.super_pixel_segmentation import slic_segmentation, crop_superpixel
 from models.KMeans import KMeans
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from torchvision.transforms import v2
+
+from models.TCAV.main import Concept, extract_cav, prepare_concept_dataset
 
 TARGET_CLASS = 0  # class from golden set(available 0, 1, 2)
 NUM_IMAGES = 50  # number of images
@@ -27,6 +31,8 @@ MIN_IMAGE_RATIO = 0.1  # minimum fraction of images a cluster should appear in (
 MIN_CLUSTER_SIZE = 10  # minimum segments in a cluster
 
 RENDER_EXAMPLES = 6
+
+N_CAVS = 1
 
 type ClassImage = Tuple[np.ndarray, int]
 
@@ -181,19 +187,26 @@ def evaluate_concepts_clusters(
     )
 
 
-def form_concepts(clusters_ids, patches, cluster_labels):
+def form_concepts(clusters_ids, patches, cluster_labels, embeddings, image_ids):
     concepts = []
 
     for cluster_id in clusters_ids:
         concept_indices = np.where(cluster_labels == cluster_id)[0]
-        concepts.append([patches[idx] for idx in concept_indices])
+        concepts.append(
+            Concept(
+                cluster_id,
+                [patches[idx] for idx in concept_indices],
+                [embeddings[idx] for idx in concept_indices],
+                [image_ids[idx] for idx in concept_indices],
+            )
+        )
 
     return concepts
 
 
-def render_concepts(concepts, render_num):
+def render_concepts(concepts: list[Concept], render_num):
     for concept_idx, concept in enumerate(concepts):
-        render_examples = concept[:render_num]
+        render_examples = concept.images[:render_num]
         actual_num_examples = len(render_examples)
 
         fig, axes = plt.subplots(
@@ -221,12 +234,62 @@ def render_concepts(concepts, render_num):
         plt.show()
 
 
+def extract_acts_and_grads(model: CNN, inputs: list[torch.Tensor], target: int, device):
+    activations = {}
+
+    def hook_fn(module, input, output):
+        activations["value"] = output
+        output.retain_grad()
+
+    handle = model.features[12].register_forward_hook(hook_fn)
+
+    def forward_and_grad(x, target_class):
+        model.zero_grad()
+
+        out = model(x.unsqueeze(0).to(device))
+        score = out[0, target_class]
+
+        score.backward()
+
+        act = activations["value"]
+        grad = activations["value"].grad
+
+        return act, grad
+
+    acts, grads = [], []
+
+    for input in inputs:
+        act, grad = forward_and_grad(input, target)
+
+        act = act.cpu().view(-1).detach().numpy()
+        grad = grad.cpu().view(-1).detach().numpy()
+
+        acts.append(act)
+        grads.append(grad)
+
+    handle.remove()
+
+    return acts, grads
+
+
+transforms = v2.Compose(
+    [
+        v2.ToImage(),
+        v2.Resize(size=(128, 128)),
+        v2.ToDtype(torch.float32, scale=True),
+        v2.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+    ]
+)
+
+
 if __name__ == "__main__":
+    np.random.seed(42)
+
     model, device = load_model()
 
     data_dir = Path(f"src/datasets/golden_set/{TARGET_CLASS}")
 
-    images_of_class = extract_images_by_classes(data_dir, TARGET_CLASS, 10)
+    images_of_class = extract_images_by_classes(data_dir, TARGET_CLASS, 50)
 
     all_embeddings, all_patches, all_img_ids = evaluate_embeddings_with_patches(
         model, images_of_class, RESOLUTIONS, COMPACTNESS, BACKGROUND_FILTER, "cuda"
@@ -235,11 +298,44 @@ if __name__ == "__main__":
     (
         cluster_ids,
         patches,
-        ids,
+        image_ids,
         embeddings,
         cluster_labels,
     ) = evaluate_concepts_clusters(all_embeddings, all_patches, all_img_ids)
 
-    concepts = form_concepts(cluster_ids, patches, cluster_labels)
+    patches_embeddings, _ = extract_acts_and_grads(
+        model, transforms(patches), 0, device
+    )
 
-    render_concepts(concepts, 10)
+    concepts = form_concepts(
+        cluster_ids, patches, cluster_labels, patches_embeddings, image_ids
+    )
+
+    # render_concepts(concepts, RENDER_EXAMPLES) Uncomment to render all concepts
+
+    _, grads = extract_acts_and_grads(
+        model,
+        transforms([image_class[0] for image_class in images_of_class]),
+        0,
+        device,
+    )
+
+    grads = np.array(grads)
+
+    for idx in range(len(concepts)):
+        main_concept, other_concepts = prepare_concept_dataset(concepts, idx)
+
+        cavs = np.array(
+            [
+                extract_cav(main_concept, other_concepts, seed=int(seed))
+                for seed in np.random.randint(0, 10000, (N_CAVS))
+            ]
+        )
+
+        results = []
+
+        for grad in grads:
+            scores = cavs @ grad
+            results.extend(scores > 0)
+
+        print(f"TCAV score for concept #{idx}: {np.mean(results)}")
