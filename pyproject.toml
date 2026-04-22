@@ -3,15 +3,18 @@ name = "ace-implementaion"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
+    "fastapi>=0.136.0",
     "matplotlib>=3.10.8",
     "numba>=0.64.0",
     "numpy>=2.4.2",
     "pathlib>=1.0.1",
     "pillow>=12.1.1",
+    "python-multipart>=0.0.26",
     "scikit-image>=0.26.0",
     "scikit-learn>=1.8.0",
     "scipy>=1.17.1",
-    "tqdm>=4.67.3",
+    "tqdm>=4.66.5",
+    "uvicorn>=0.45.0",
 ]
 
 [tool.uv]

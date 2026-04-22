@@ -3,3 +3,5 @@ __pycache__
 *.pth
 .venv
 saved_concepts
+
+node_modules/

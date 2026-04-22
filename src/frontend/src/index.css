@@ -1,0 +1,28 @@
+:root {
+  --bg-color: hsl(0, 0%, 15%);
+  --hbg-color: hsl(0, 0%, 25%);
+  --fg-color: hsl(0, 0%, 80%);
+  --hfg-color: hsl(0, 0%, 95%);
+
+  --dark-text: hsl(0, 0%, 20%);
+  --light-text: hsl(0, 0%, 90%);
+}
+
+div, p {
+  color: var(--light-text);
+  
+  font-family: "Roboto Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-color);
+}

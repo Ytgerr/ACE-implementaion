@@ -1,0 +1,230 @@
+.main-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+
+.images-h-list {
+    width: 100%;
+    background: var(--hbg-color);
+    padding: 20px 0;
+}
+
+.images-container {
+    display: flex;
+    width: 100%;
+    overflow-x: scroll;
+    overflow-y: visible;
+    scrollbar-width: thin;
+    height: 110px;
+}
+
+.images-list-item {
+    width: 100px;
+    margin: 0 10px;
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+.images-list-item img {
+    width: 100%;
+    border-radius: 10px;
+    
+    &:hover {
+        scale: 1.1;
+        transition: 0.15s;
+        border: 3px solid wheat;
+        z-index: 2;
+    }
+}
+
+
+.carousel {
+    overflow: hidden;
+    width: 100%;
+    background: var(--hbg-color);
+    padding: 20px 0;
+}
+
+.carousel-track {
+    display: flex;
+    width: fit-content;
+    animation: scroll 15s linear infinite;
+}
+
+.carousel-item {
+    min-width: 180px;
+    margin: 0 10px;
+    flex-shrink: 0;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    
+    &:hover {
+        scale: 1.05;
+        transition: 0.15s;
+        border: 3px solid var(--fg-color);
+        z-index: 1;
+    }
+}
+
+@keyframes scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.carousel:hover .carousel-track {
+    animation-play-state: paused;
+}
+
+
+.content-block {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    border-radius: 28px;
+    border: 2px solid var(--fg-color);
+    box-sizing: border-box;
+    padding: 28px;
+    background-color: var(--hbg-color);
+}
+
+.concept-title {
+    align-self: baseline;
+    margin-left: 32px;
+}
+
+.main-title, .summary {
+    width: 60%;
+    text-align: center;
+}
+
+.main-description {
+    width: 40%;
+    text-align: center;
+}
+
+.highlited-section {
+    background-color: rgba(from var(--fg-color) r g b / 0.3);
+    border: 2px dashed rgba(from var(--hfg-color) r g b / 0.6);
+    color: rgba(from var(--light-text) r g b / 0.80);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: left;
+}
+
+.slic-showcase {
+    background-color: var(--fg-color);
+    box-sizing: border-box;
+    padding: 28px;
+    border-radius: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.slic-result {
+    display: flex;
+    color: var(--dark-text);
+    gap: 32px;
+
+    & div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    & img {
+        max-width: 450px;
+    }
+}
+
+.slic-title, .slic-result>div h4 {
+    color: var(--dark-text);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.slic-buttons {
+    display: flex;
+    gap: 32px;
+}
+
+.special-button {
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid var(--hbg-color);
+    background-color: var(--hfg-color);
+    color: var(--dark-text);
+    font-size: 1rem;
+}
+
+.current-class {
+    width: 220px;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid var(--hbg-color);
+    background-color: var(--hfg-color);
+    color: var(--dark-text);
+    font-size: 1rem;
+    anchor-name: --anchor-1;
+}
+
+.classes-dropdown {
+    position: absolute;
+    position-anchor: --anchor-1;
+    position-area: bottom center;
+    z-index: 10; 
+    top: 0;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
+    border: 1px solid var(--hbg-color);
+    background-color: var(--hfg-color);
+    color: var(--dark-text);
+    font-size: 1rem;
+}
+
+.class-choice {
+    padding: 8px;
+    box-sizing: border-box;
+    color: var(--dark-text);
+    &:hover {
+        background-color: hsl(from var(--hfg-color) h s calc(l - 10))
+    }
+}
+
+.description {
+    padding: 8px;
+}
+
+.concepts-hparams {
+    width: 700px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background-color: var(--hbg-color);
+    padding: 16px;
+    border-radius: 16px;
+    border: 2px dashed rgba(from var(--hfg-color) r g b / 0.6);
+}
+
+.num-concepts, .num-images-to-analyze, .num-cavs {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
