@@ -66,28 +66,6 @@ function SLICShowcase() {
   );
 }
 
-function TCAVScoring( ) {
-    
-
-    return (
-        <>
-            
-
-            {/* {concepts.map((concept, index) => {
-                if (concepts[0].length > 0) {
-                    return(
-                        concept.map((patch, index) => (
-                            <img src={patch}/>
-                        ))
-                    )
-                }
-            })} */}
-
-            ТУТА БУДЕТ ТКАВ СКОРИНГ ЁПТА
-        </>
-    )
-}
-
 function Carousel({ images }) {
   
   const extendedImages = [...images, ...images];

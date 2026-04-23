@@ -59,24 +59,3 @@ def extract_cav(
     cav = cav / np.linalg.norm(cav)
 
     return cav
-
-
-def extract_cav_noisy(concept):
-    """
-    Extracts concept activation vector with respect to random noise vectors, not real ones
-    """
-    ...
-
-
-def directional_derivative(image, cav):
-    """
-    Computes score for how cav affects on prediction of image
-    """
-    ...
-
-
-def tcav():
-    """
-    Tests how concept affects on prediction
-    """
-    ...
