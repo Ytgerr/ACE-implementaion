@@ -228,3 +228,13 @@ input[type="file"] {
     gap: 16px;
     align-items: center;
 }
+
+.expand-message {
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid var(--hbg-color);
+    background-color: var(--hfg-color);
+    color: var(--dark-text);
+    font-size: 1rem;
+    width: fit-content;
+}

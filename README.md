@@ -66,6 +66,20 @@ A custom Convolutional Neural Network (CNN) was trained on the Imagenette datase
 
 Final accuracy: 85.87% after 80 epochs
 
+## Load UV
+
+All this project works on UV python package manager. To install it, please use one of follows:
+
+For Linux
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+For Windows
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
 ## Load the CNN
 
 To load the model you may go here:
@@ -74,10 +88,28 @@ To load the model you may go here:
 http://193.104.57.253/download/cnn_model
 ```
 
-Put loaded file into CNN folder before use
+Put loaded file into `src/models/CNN` folder before use
 
 ## To Load Dependencies
+You may use either gpu or cpu dependencies
 
 ```bash
 uv sync --extra gpu --index-strategy unsafe-best-match
 ```
+
+## To start demonstration
+
+Simply run script \
+For Linux:
+```bash
+sudo chmod +x ./start.sh
+bash start.sh
+```
+
+For Windows:
+```powershell
+./start.ps1
+```
+And go to http://localhost:5173/
+
+_Sometimes VPN may block local vite (frontend) server*_

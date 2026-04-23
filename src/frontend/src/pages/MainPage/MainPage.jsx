@@ -137,7 +137,7 @@ function Description({title, shortDesc, longDesc}) {
         <div className="expand-button"
             onClick={() => setIsExpanded(!isExpanded)}
         >
-            {!isExpanded? "Expand v": "Shrink ^"}
+            <div className="expand-message">{!isExpanded? "Expand v": "Shrink ^"}</div>
         </div>
         {isExpanded? 
             <p className="long-description highlited-section">
