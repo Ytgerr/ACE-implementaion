@@ -17,7 +17,7 @@
     width: 100%;
     overflow-x: scroll;
     overflow-y: visible;
-    scrollbar-width: thin;
+    scrollbar-width: none;
     height: 110px;
 }
 

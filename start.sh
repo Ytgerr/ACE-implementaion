@@ -7,6 +7,7 @@ BACK_PID=$!
 
 # Start frontend
 cd frontend || exit
+npm install
 npm run dev &
 FRONT_PID=$!
 
